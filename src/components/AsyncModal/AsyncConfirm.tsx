@@ -1,14 +1,8 @@
-import { ReactNode, useCallback } from "react";
+import { useCallback } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { usePushAsyncModal } from "./AsyncModal";
 
-export interface AsyncConfirmProps {
-  title?: ReactNode;
-  message?: ReactNode;
-  footer?: ReactNode;
-  cancel?: string;
-  accept?: string;
-}
+import { usePushAsyncModal } from "./AsyncModal";
+import { AsyncConfirmProps } from "./type";
 
 export const useAsyncConfirm = () => {
   const showModal = usePushAsyncModal();

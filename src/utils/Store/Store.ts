@@ -4,7 +4,6 @@ import {
   createElement,
   FC,
   Fragment,
-  ReactNode,
   useContext,
   useEffect,
   useState,
@@ -15,6 +14,11 @@ import {
   ContainerLifeCycle,
   ContainerLifePoint,
   ActionCreator,
+  ContainerProps,
+  HookSelect,
+  SubscriberProps,
+  UseAction,
+  UseHook,
 } from "./type";
 import { Subscriber } from "./Subscriber";
 
@@ -32,9 +36,10 @@ export class Store<State, Action> {
     this.Context.displayName = displayName;
   }
 
-  createContainer(cycle: ContainerLifeCycle<State, Action> = {}) {
+  createContainer<Props extends ContainerProps<State>>(
+    cycle: ContainerLifeCycle<State, Action> = {}
+  ): FC<Props> {
     const { Context, createAction } = this;
-    type Props = { state: State; children?: ReactNode };
 
     const firePoint = (
       store: Subscriber<State, Action>,
@@ -63,11 +68,10 @@ export class Store<State, Action> {
     return Container;
   }
 
-  createSubscriber<Value = State>(selector?: HookSelector<State, Value>) {
+  createSubscriber<Props extends SubscriberProps<Value, Action>, Value = State>(
+    selector?: HookSelector<State, Value>
+  ): FC<Props> {
     const useHook = this.createHook(selector);
-    type Props = {
-      children: (state: Value, action: Action) => ReactNode;
-    };
 
     const Subscriber: FC<Props> = ({ children }) => {
       const [state, action] = useHook();
@@ -78,10 +82,13 @@ export class Store<State, Action> {
     return Subscriber;
   }
 
-  createHook<Value = State, Flags extends any[] = never>(
+  createHook<
+    Select extends HookSelect<State, Flags, Value>,
+    Value = State,
+    Flags extends any[] = never
+  >(
     selector?: HookSelector<State, Value, Flags>
-  ) {
-    type Select = (state: State, ...flags: Flags) => Value;
+  ): UseHook<Flags, Value, Action> {
     const select = (selector || ((v) => v)) as Select;
 
     return (...flags: Flags): [Value, Action] => {
@@ -103,7 +110,7 @@ export class Store<State, Action> {
     };
   }
 
-  createHookAction() {
+  createHookAction(): UseAction<Action> {
     return () => useContext(this.Context).action;
   }
 }

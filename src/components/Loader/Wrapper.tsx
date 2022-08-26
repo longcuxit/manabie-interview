@@ -6,19 +6,12 @@ import {
   FunctionComponent,
 } from "react";
 import classNames from "classnames";
-import { Spinner, SpinnerProps } from "react-bootstrap";
-import { BsPrefixProps } from "react-bootstrap/esm/helpers";
+import { Spinner } from "react-bootstrap";
 
 import { LoaderContainer, useLoading } from "./Store";
+import { LoaderWrapperProps } from "./type";
 
 import "./style.css";
-
-export interface LoaderWrapperProps
-  extends BsPrefixProps,
-    React.HTMLAttributes<HTMLElement> {
-  duration?: number;
-  SpinnerProps?: SpinnerProps;
-}
 
 export function LoaderWrapper({
   as = "div",

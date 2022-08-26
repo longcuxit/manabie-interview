@@ -3,16 +3,13 @@ import { CloseButton, FormCheck, ListGroup, Spinner } from "react-bootstrap";
 
 import classNames from "classnames";
 
-import { TodoModel, TodoStatus } from "models/Todo";
+import { TodoStatus } from "models/Todo";
 import { useTodoActions } from "store/Todos";
 import { useLoading, withLoader } from "components/Loader";
 import { useAsyncConfirm } from "components/AsyncModal";
 import { createLocalStorage } from "utils";
 import TodoForm from "./Form";
-
-export interface TodoItemProps {
-  item: TodoModel;
-}
+import { TodoItemProps } from "./type";
 
 const askMeDelete = createLocalStorage("DeleteAnItem", true);
 

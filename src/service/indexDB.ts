@@ -12,13 +12,18 @@ export function toAsync<T>(request: IDBRequest<T>) {
   });
 }
 
-type StoreMode = "readonly" | "readwrite";
+export enum StoreMode {
+  readonly = "readonly",
+  readwrite = "readwrite",
+}
+export type StoreSelect = (mode?: StoreMode) => IDBObjectStore;
 
-export class IndexDBControl {
-  constructor(public database: IDBDatabase, public name: string) {}
-
-  store(mode: StoreMode = "readonly") {
-    const trans = this.database.transaction(this.name, mode);
-    return trans.objectStore(this.name);
-  }
+export function createStoreSelect(
+  database: IDBDatabase,
+  name: string
+): StoreSelect {
+  return (mode = StoreMode.readonly) => {
+    const trans = database.transaction(name, mode);
+    return trans.objectStore(name);
+  };
 }

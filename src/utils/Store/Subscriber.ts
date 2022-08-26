@@ -6,12 +6,12 @@ export class Subscriber<V, A> extends ValueChanged<V> {
   action: A;
 
   api = Object.freeze({
-    get: () => this.value,
-    set: (value: SetStateAction<V>) => {
+    get: (): V => this.value,
+    set: (value: SetStateAction<V>): void => {
       if (value instanceof Function) this.value = value(this.value);
       else this.value = value;
     },
-    partial: (value: SetStatePartialAction<V>) => {
+    partial: (value: SetStatePartialAction<V>): void => {
       let nextValue: Partial<V>;
 
       if (value instanceof Function) nextValue = value(this.value);

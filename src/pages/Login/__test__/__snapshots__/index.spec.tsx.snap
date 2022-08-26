@@ -3,9 +3,9 @@
 exports[`pages/Login: match snapshot 1`] = `
 <div>
   <section
-    class="vh-100 d-flex flex-column justify-content-between Loader"
-    style="--loader-duration: 300ms;"
+    class="vh-100 d-flex flex-column justify-content-between"
   >
+    <div />
     <div
       class="container-fluid"
     >

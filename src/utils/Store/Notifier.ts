@@ -8,14 +8,15 @@ export class Notifier {
   }
 
   addListen(listener: Listener): () => void {
-    this._listens.push(listener);
+    const { _listens } = this;
+    _listens.push(listener);
     return () => {
-      this._listens.splice(this._listens.indexOf(listener), 1);
+      _listens.splice(_listens.indexOf(listener), 1);
     };
   }
 
   protected notify(): void {
-    this._listens.forEach((listener) => listener());
+    this._listens.slice().forEach((listener) => listener());
   }
 }
 

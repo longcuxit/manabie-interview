@@ -1,9 +1,9 @@
 import { IAPI } from "./types";
 import { TodoModel, TodoStatus } from "models/Todo";
 import { AuthModel } from "models/User";
-import { IndexDBControl, toAsync } from "./indexDB";
+import { createStoreSelect, StoreMode, StoreSelect, toAsync } from "./indexDB";
 
-let todoDB: IndexDBControl;
+let todoStore: StoreSelect;
 
 class ApiFrontend extends IAPI {
   async connect() {
@@ -20,12 +20,12 @@ class ApiFrontend extends IAPI {
     };
 
     const db = await toAsync(request);
-    todoDB = new IndexDBControl(db, "toDoList");
+    todoStore = createStoreSelect(db, "toDoList");
     return true;
   }
 
   async getTodos(): Promise<TodoModel[]> {
-    return toAsync(todoDB.store().getAll());
+    return toAsync(todoStore().getAll());
   }
 
   async createTodo(content: string): Promise<TodoModel> {
@@ -35,35 +35,35 @@ class ApiFrontend extends IAPI {
       status: TodoStatus.ACTIVE,
       user_id: "user_id",
     };
-    const id = await toAsync(todoDB.store("readwrite").add(newTodo));
+    const id = await toAsync(todoStore(StoreMode.readwrite).add(newTodo));
     return { ...newTodo, id: id.toString() };
   }
 
   async removeTodo(id: string): Promise<boolean> {
-    await toAsync(todoDB.store("readwrite").delete(+id));
+    await toAsync(todoStore(StoreMode.readwrite).delete(+id));
     return true;
   }
 
   async updateTodoStatus(id: string, status: TodoStatus): Promise<boolean> {
-    const todo = await toAsync<TodoModel>(todoDB.store().get(+id));
+    const todo = await toAsync<TodoModel>(todoStore().get(+id));
     todo.status = status;
-    await toAsync(todoDB.store("readwrite").put(todo));
+    await toAsync(todoStore(StoreMode.readwrite).put(todo));
     return true;
   }
 
   async updateTodoContent(id: string, content: string): Promise<boolean> {
-    const todo = await toAsync<TodoModel>(todoDB.store().get(+id));
+    const todo = await toAsync<TodoModel>(todoStore().get(+id));
     todo.content = content;
-    await toAsync(todoDB.store("readwrite").put(todo));
+    await toAsync(todoStore(StoreMode.readwrite).put(todo));
     return true;
   }
 
   async clearTodos(ids?: string[]): Promise<boolean> {
     if (ids) {
-      const store = todoDB.store("readwrite");
+      const store = todoStore(StoreMode.readwrite);
       await Promise.all(ids.map((id) => toAsync(store.delete(+id))));
     } else {
-      await toAsync(todoDB.store("readwrite").clear());
+      await toAsync(todoStore(StoreMode.readwrite).clear());
     }
 
     return true;
@@ -71,7 +71,7 @@ class ApiFrontend extends IAPI {
 
   async updateAllTodoStatus(status: TodoStatus): Promise<boolean> {
     return new Promise((next, error) => {
-      const store = todoDB.store("readwrite");
+      const store = todoStore(StoreMode.readwrite);
       const req = store.openCursor();
       req.onsuccess = () => {
         const cursor = req.result;

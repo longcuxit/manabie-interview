@@ -1,6 +1,5 @@
 import { Container, Image } from "react-bootstrap";
 
-import { LoaderWrapper } from "components/Loader";
 import FormLogin from "./Form";
 
 export default function Login() {

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, ReactNode, SetStateAction } from "react";
 
 export type SetStatePartialAction<S, R = Partial<S>> =
   | R
@@ -35,3 +35,18 @@ export type HookSelector<V, S, F extends any[] = never> = (
   value: V,
   ...flags: F
 ) => S;
+
+export type ContainerProps<State> = { state: State; children?: ReactNode };
+export type SubscriberProps<Value, Action> = {
+  children: (state: Value, action: Action) => ReactNode;
+};
+export type HookSelect<State, Flags extends any[], Value> = (
+  state: State,
+  ...flags: Flags
+) => Value;
+
+export type UseHook<Flags extends any[], Value, Action> = (
+  ...flags: Flags
+) => [Value, Action];
+
+export type UseAction<Action> = () => Action;

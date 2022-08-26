@@ -1,14 +1,10 @@
-import classNames from "classnames";
-import { useLoading } from "components/Loader";
-import { FocusEventHandler, FormEvent, MouseEvent, useState } from "react";
+import { FormEvent, MouseEvent, useState } from "react";
 import { InputGroup, FormControl, Spinner } from "react-bootstrap";
 import { Send, PencilFill } from "react-bootstrap-icons";
 
-export interface TodoFormProps {
-  defaultValue?: string;
-  onSubmit: (value: string) => Promise<void>;
-  onBlur?: FocusEventHandler<HTMLFormElement>;
-}
+import classNames from "classnames";
+import { useLoading } from "components/Loader";
+import { TodoFormProps } from "./type";
 
 export default function TodoForm({
   defaultValue = "",

@@ -20,7 +20,8 @@ import { usePushLoader } from "components/Loader";
 import { PartialCheckbox } from "components/PartialCheckbox";
 import { useAsyncConfirm } from "components/AsyncModal";
 
-import { StatusFilter, useTodoFilter } from "./Store.filter";
+import { useTodoFilter } from "./Store.filter";
+import { StatusFilter } from "./type";
 
 const statusList: StatusFilter[] = [
   "ALL",

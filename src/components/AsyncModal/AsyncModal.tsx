@@ -1,13 +1,7 @@
 import { ReactNode } from "react";
 import { Modal, ModalProps } from "react-bootstrap";
 import { Store } from "utils/Store";
-
-export type RendererAsyncModal<T = unknown> = (
-  pop: (result?: T) => void,
-  props?: ModalProps
-) => ReactNode;
-
-export type ShowAsyncModal<T> = (content: RendererAsyncModal<T>) => Promise<T>;
+import { RendererAsyncModal } from "./type";
 
 type ModalStack<T = any> = {
   id: number;
