@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/PartialCheckbox: snapshot checked 1`] = `
+<div>
+  <div
+    class=""
+  >
+    <input
+      checked=""
+      class="form-check-input"
+      type="checkbox"
+    />
+  </div>
+</div>
+`;

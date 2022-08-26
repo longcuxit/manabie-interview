@@ -1,0 +1,28 @@
+.Loader {
+  position: relative;
+}
+
+.Loader ::before,
+.Loader-spinner {
+  position: absolute;
+  opacity: 0;
+  z-index: 999999;
+  transition: all ease-out var(--loader-duration);
+}
+
+.Loader-spinner {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.Loader.Loader-loading ::before,
+.Loader.in ::before {
+  content: "";
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.Loader.Loader-loading.in ::before,
+.Loader.Loader-loading.in .Loader-spinner {
+  opacity: 1;
+}
