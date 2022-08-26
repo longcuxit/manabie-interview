@@ -5,10 +5,8 @@ import FormLogin from "./Form";
 
 export default function Login() {
   return (
-    <LoaderWrapper
-      as="section"
-      className="vh-100 d-flex flex-column justify-content-between"
-    >
+    <section className="vh-100 d-flex flex-column justify-content-between">
+      <div />
       <Container fluid>
         <div className="row d-flex justify-content-center align-items-center h-100">
           <div className="col-md-9 col-lg-6 col-xl-5">
@@ -28,6 +26,6 @@ export default function Login() {
           Copyright © 2020. All rights reserved.
         </div>
       </div>
-    </LoaderWrapper>
+    </section>
   );
 }

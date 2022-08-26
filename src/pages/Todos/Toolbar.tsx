@@ -78,19 +78,21 @@ export default function TodoToolbar() {
     <Navbar bg="primary" className="sticky-top">
       <Container>
         {Boolean(todos.size) && (
-          <PartialCheckbox
-            className="mx-2"
-            checked={
-              countActive === todos.size
-                ? false
-                : countActive === 0
-                ? true
-                : undefined
-            }
-            onChange={({ target }) =>
-              pushLoader(todoActions.toggleAll(!target.checked))
-            }
-          />
+          <label className="label-big-holder ">
+            <PartialCheckbox
+              className="mx-2"
+              checked={
+                countActive === todos.size
+                  ? false
+                  : countActive === 0
+                  ? true
+                  : undefined
+              }
+              onChange={({ target }) =>
+                pushLoader(todoActions.toggleAll(!target.checked))
+              }
+            />
+          </label>
         )}
         <InputGroup size="sm">
           <FormControl

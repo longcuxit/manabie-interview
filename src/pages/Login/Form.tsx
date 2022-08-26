@@ -37,7 +37,7 @@ export default function FormLogin() {
       </div>
 
       <div className="text-center text-lg-start mt-4 pt-2">
-        <Button size="lg" className="px-2" type="submit">
+        <Button size="lg" className="px-2 w-100" type="submit">
           Login
         </Button>
 

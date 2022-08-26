@@ -8,6 +8,8 @@ import TodoForm from "./Form";
 import TodoList from "./List";
 import TodoToolbar from "./Toolbar";
 
+import "./style.css";
+
 const ToDoPage = () => {
   const todoActions = useTodoActions();
   const pushLoader = usePushLoader();
@@ -17,7 +19,7 @@ const ToDoPage = () => {
   }, [pushLoader, todoActions]);
 
   return (
-    <div>
+    <div className="Page-todos">
       <TodoToolbar />
       <TodoList />
       <div className="position-sticky bg-light py-2" style={{ bottom: 0 }}>

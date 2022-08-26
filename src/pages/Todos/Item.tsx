@@ -71,12 +71,14 @@ function TodoItem({ item }: TodoItemProps) {
         />
       ) : (
         <>
-          <FormCheck
-            checked={!isActive}
-            onChange={() =>
-              pushLoader(actions.updateStatus(item.id, !isActive))
-            }
-          />
+          <label className="label-big-holder">
+            <FormCheck
+              checked={!isActive}
+              onChange={() =>
+                pushLoader(actions.updateStatus(item.id, !isActive))
+              }
+            />
+          </label>
           <div className="flex-fill px-2">{item.content}</div>
           {loading ? (
             <Spinner animation="border" size="sm" className="mx-1" />

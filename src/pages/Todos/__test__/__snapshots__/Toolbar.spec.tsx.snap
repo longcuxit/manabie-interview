@@ -8,6 +8,9 @@ exports[`pages/Todos/ToolBar:  should match snapshot 1`] = `
     <div
       class="container"
     >
+      <label
+        class="label-big-holder "
+      />
       <div
         class="input-group input-group-sm"
       >

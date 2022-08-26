@@ -11,14 +11,18 @@ exports[`pages/Todos/List should match snapshot 1`] = `
       <div
         class="d-flex flex-row p-2 align-items-center list-group-item"
       >
-        <div
-          class=""
+        <label
+          class="label-big-holder"
         >
-          <input
-            class="form-check-input"
-            type="checkbox"
-          />
-        </div>
+          <div
+            class=""
+          >
+            <input
+              class="form-check-input"
+              type="checkbox"
+            />
+          </div>
+        </label>
         <div
           class="flex-fill px-2"
         >
@@ -33,15 +37,19 @@ exports[`pages/Todos/List should match snapshot 1`] = `
       <div
         class="d-flex flex-row p-2 align-items-center list-group-item"
       >
-        <div
-          class=""
+        <label
+          class="label-big-holder"
         >
-          <input
-            checked=""
-            class="form-check-input"
-            type="checkbox"
-          />
-        </div>
+          <div
+            class=""
+          >
+            <input
+              checked=""
+              class="form-check-input"
+              type="checkbox"
+            />
+          </div>
+        </label>
         <div
           class="flex-fill px-2"
         >
@@ -56,14 +64,18 @@ exports[`pages/Todos/List should match snapshot 1`] = `
       <div
         class="d-flex flex-row p-2 align-items-center list-group-item"
       >
-        <div
-          class=""
+        <label
+          class="label-big-holder"
         >
-          <input
-            class="form-check-input"
-            type="checkbox"
-          />
-        </div>
+          <div
+            class=""
+          >
+            <input
+              class="form-check-input"
+              type="checkbox"
+            />
+          </div>
+        </label>
         <div
           class="flex-fill px-2"
         >
