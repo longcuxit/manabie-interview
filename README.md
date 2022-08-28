@@ -74,6 +74,14 @@ Last updated: 2022/01/13
 - Update lasted packages (if project not working, please remove `node_modules`, use node v14 and install again)
 - Change store from reducer to sweet format `src/utils/Store` (inspired by `react-sweet-context`)
 - Change code base structure from single page to multi pages `src/pages`
+- fences structure
+
+  - `components`: can not import: `models`, `pages`, `service`, `store`
+  - `models`: can not import: `components`, `pages`, `service`, `store`
+  - `pages`: can not import from another page the same level, (only accept `pages/path`: using switch to another pages)
+  - `service`: can not import `components`, `pages`, `store`
+  - `store`: can not import `components`, `pages`
+  - `utils`: can not import from another folder the same level
 
 - `PartialCheckbox` component: Show checkbox in partial
 - `Loader` component: Manager multiple loading state by push promise

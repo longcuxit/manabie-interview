@@ -1,5 +1,6 @@
 export * from "./polyfill";
 export * from "./Completer";
+export * from "./Store";
 
 export function debounce<T, A extends any[] = never>(
   call: (this: T, ...args: A) => void,

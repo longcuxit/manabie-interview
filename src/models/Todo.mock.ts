@@ -1,6 +1,6 @@
-import { TodoModel, TodoStatus } from "models/Todo";
 import { loremIpsum } from "lorem-ipsum";
 import shortid from "shortid";
+import { TodoStatus, TodoModel } from "./Todo";
 
 const status = [TodoStatus.ACTIVE, TodoStatus.COMPLETED];
 

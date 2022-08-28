@@ -1,6 +1,5 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import { TodoModel, TodoStatus } from "models/Todo";
-import Item from "../Item";
 
 import { useTodos } from "store/Todos";
 import { useAsyncConfirm } from "components/AsyncModal";
@@ -9,7 +8,7 @@ import { useTodoFilter } from "../Store.filter";
 import { PartialCheckbox } from "components/PartialCheckbox";
 
 import TodoToolbar from "../Toolbar";
-import { fakeTodo } from "utils/testing";
+import { fakeTodo } from "models/Todo.mock";
 
 jest.mock("../Store.filter", () => ({ useTodoFilter: jest.fn() }));
 jest.mock("store/Todos", () => ({ useTodos: jest.fn() }));

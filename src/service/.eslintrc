@@ -1,0 +1,17 @@
+{
+  "extends": "../../.eslintrc",
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          "components/**",
+          "pages",
+          "pages/**",
+          "store/**",
+          "!./**"
+        ]
+      }
+    ]
+  }
+}

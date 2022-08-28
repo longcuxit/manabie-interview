@@ -5,7 +5,7 @@ import TodoList from "../List";
 
 import { useTodoActions, useTodos } from "store/Todos";
 import { useTodoFilter } from "../Store.filter";
-import { fakeTodo } from "utils/testing";
+import { fakeTodo } from "models/Todo.mock";
 
 jest.mock("store/Todos", () => ({
   useTodos: jest.fn(),

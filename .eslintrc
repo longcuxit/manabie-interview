@@ -1,0 +1,26 @@
+{
+  "extends": "react-app",
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      "../",
+      "../**",
+      "!./"
+    ],
+    "import/no-internal-modules": [
+      "error",
+      {
+        "forbid": [
+          "components",
+          "models",
+          "store",
+          "components/*/**",
+          "models/*/**",
+          "store/*/**",
+          "utils/*/**",
+          "service/**"
+        ]
+      }
+    ]
+  }
+}

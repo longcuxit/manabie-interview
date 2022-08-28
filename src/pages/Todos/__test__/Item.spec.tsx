@@ -1,11 +1,10 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import { TodoStatus } from "models/Todo";
+import { fakeTodo } from "models/Todo.mock";
 import Item from "../Item";
-
 import { useTodoActions } from "store/Todos";
 import { useAsyncConfirm } from "components/AsyncModal";
 import { useLoading } from "components/Loader";
-import { fakeTodo } from "utils/testing";
 import TodoForm from "../Form";
 
 jest.mock("store/Todos", () => ({ useTodoActions: jest.fn() }));

@@ -1,0 +1,15 @@
+{
+  "extends": "../../.eslintrc",
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          "pages/**",
+          "!pages/path",
+          "!./**"
+        ]
+      }
+    ]
+  }
+}

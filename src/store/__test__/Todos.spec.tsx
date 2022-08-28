@@ -3,7 +3,7 @@ import { useTodos } from "../Todos";
 
 import Service from "service";
 import { TodoStatus } from "models/Todo";
-import { fakeTodo } from "utils/testing";
+import { fakeTodo } from "models/Todo.mock";
 
 jest.mock("service", () => {
   const fns: Record<string, jest.Mock> = {};
