@@ -1,10 +1,10 @@
 import { render } from "@testing-library/react";
 
-import { useTodoActions } from "store/Todos";
+import { useTodoActions } from "store/TodoList";
 import { usePushLoader } from "components/Loader";
-import ToDoPage from "../index";
+import TodoPage from "../index";
 
-jest.mock("store/Todos", () => ({ useTodoActions: jest.fn() }));
+jest.mock("store/TodoList", () => ({ useTodoActions: jest.fn() }));
 jest.mock("components/Loader", () => ({ usePushLoader: jest.fn() }));
 
 jest.mock("../Toolbar", () => () => <div>TodoToolbar</div>);
@@ -26,7 +26,7 @@ describe("pages/Todos/List", () => {
   });
 
   it("should initialize todos", () => {
-    render(<ToDoPage />);
+    render(<TodoPage />);
 
     expect(initialize).toBeCalledTimes(1);
     expect(pushLoader).toBeCalledTimes(1);

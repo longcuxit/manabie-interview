@@ -1,7 +1,7 @@
 import { TodoModel, TodoStatus } from "models/Todo";
 import Service from "service";
 import { Store } from "utils/Store";
-import { TodoActions, TodoState } from "./Todos.type";
+import { TodoActions, TodoState } from "./TodoList.type";
 
 const initialState: TodoState = {
   todos: new Map<string, TodoModel>(),
@@ -111,8 +111,8 @@ const store = new Store<TodoState, TodoActions>(
   })
 );
 
-export const useTodos = store.createHook();
+export const useTodoList = store.createHook();
 
 export const useTodoActions = store.createHookAction();
 
-export * from "./Todos.type";
+export * from "./TodoList.type";

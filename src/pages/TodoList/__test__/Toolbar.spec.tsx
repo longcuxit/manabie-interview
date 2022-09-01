@@ -1,7 +1,7 @@
 import { act, fireEvent, render, within } from "@testing-library/react";
 import { TodoModel, TodoStatus } from "models/Todo";
 
-import { useTodos } from "store/Todos";
+import { useTodoList } from "store/TodoList";
 import { usePushAskConfirm } from "components/AsyncRender";
 import { usePushLoader } from "components/Loader";
 import { useTodoFilter } from "../Store.filter";
@@ -10,14 +10,14 @@ import TodoToolbar from "../Toolbar";
 import { fakeTodo } from "models/Todo.mock";
 
 jest.mock("../Store.filter", () => ({ useTodoFilter: jest.fn() }));
-jest.mock("store/Todos", () => ({ useTodos: jest.fn() }));
+jest.mock("store/TodoList", () => ({ useTodoList: jest.fn() }));
 jest.mock("components/AsyncRender", () => ({ usePushAskConfirm: jest.fn() }));
 jest.mock("components/Loader", () => ({
   usePushLoader: jest.fn(),
   withLoader: (Com: any) => Com,
 }));
 
-const mockUseTodos = useTodos as jest.Mock;
+const mockuseTodoList = useTodoList as jest.Mock;
 const mockUsePushAskConfirm = usePushAskConfirm as jest.Mock;
 const mockUsePushLoader = usePushLoader as jest.Mock;
 const mockUseTodoFilter = useTodoFilter as jest.Mock;
@@ -31,7 +31,7 @@ Array.from({ length: 3 }, (_, i) => {
   mapTodos.set(todo.id, todo);
 });
 
-describe("pages/Todos/ToolBar: ", () => {
+describe("pages/TodoList/ToolBar: ", () => {
   const pushLoader = jest.fn();
   const updateStatus = jest.fn();
   const showConfirm = jest.fn();
@@ -48,7 +48,7 @@ describe("pages/Todos/ToolBar: ", () => {
       { status: filterStatus, keyword: filterKeyword },
     ]);
     mockUsePushLoader.mockReturnValue(pushLoader);
-    mockUseTodos.mockReturnValue([
+    mockuseTodoList.mockReturnValue([
       { todos: mapTodos, countActive: 1 },
       { updateStatus, clearAll, toggleAll },
     ]);
@@ -96,7 +96,7 @@ describe("pages/Todos/ToolBar: ", () => {
 
   describe("toggle all", () => {
     it("should show checked & complete all todos", () => {
-      mockUseTodos.mockReturnValue([
+      mockuseTodoList.mockReturnValue([
         { todos: mapTodos, countActive: 0 },
         { toggleAll },
       ]);
@@ -109,7 +109,7 @@ describe("pages/Todos/ToolBar: ", () => {
     });
 
     it("should show unChecked & active all todos", () => {
-      mockUseTodos.mockReturnValue([
+      mockuseTodoList.mockReturnValue([
         { todos: mapTodos, countActive: 3 },
         { toggleAll },
       ]);

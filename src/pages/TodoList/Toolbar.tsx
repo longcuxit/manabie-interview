@@ -16,7 +16,7 @@ import Logout from "@mui/icons-material/Logout";
 
 import { TodoStatus } from "models/Todo";
 import { useAuthAction } from "store/Auth";
-import { useTodos } from "store/Todos";
+import { useTodoList } from "store/TodoList";
 
 import { usePushLoader } from "components/Loader";
 import { usePushAskConfirm } from "components/AsyncRender";
@@ -46,7 +46,7 @@ export default function TodoToolbar() {
   const showConfirm = usePushAskConfirm();
   const pushLoader = usePushLoader();
 
-  const [{ todos, countActive }, todoActions] = useTodos();
+  const [{ todos, countActive }, todoActions] = useTodoList();
   const [{ status, keyword }, filterActions] = useTodoFilter();
 
   const handleDelete = () => {

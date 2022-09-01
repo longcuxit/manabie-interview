@@ -14,7 +14,7 @@ jest.mock("utils/axios", () => ({
   interceptors: { request: { use: jest.fn(), eject: jest.fn() } },
 }));
 
-jest.mock("../Todos", () => () => <>PageTodos</>);
+jest.mock("../TodoList", () => () => <>PageTodos</>);
 jest.mock("../Login", () => () => <>PageLogin</>);
 
 const fakeAuth: AuthModel = {

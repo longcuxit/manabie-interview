@@ -1,6 +1,6 @@
 import { act } from "@testing-library/react";
 
-import { useTodos } from "../Todos";
+import { useTodoList } from "../TodoList";
 
 import Service from "service";
 import { TodoStatus } from "models/Todo";
@@ -28,7 +28,7 @@ const fakeTodos = Array.from({ length: 2 }, (_, i) =>
 
 describe("stores/Todos:", () => {
   it("should fetch todos", async () => {
-    const { result } = renderHook(useTodos);
+    const { result } = renderHook(useTodoList);
 
     mockService.getTodos.mockResolvedValueOnce(fakeTodos);
 
@@ -41,7 +41,7 @@ describe("stores/Todos:", () => {
 
   describe("clear completed items", () => {
     it("should skip from api", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.clearTodos.mockResolvedValueOnce(false);
 
@@ -53,7 +53,7 @@ describe("stores/Todos:", () => {
     });
 
     it("should success", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.clearTodos.mockResolvedValueOnce(true);
 
@@ -66,7 +66,7 @@ describe("stores/Todos:", () => {
   });
 
   it("should add an item", async () => {
-    const { result } = renderHook(useTodos);
+    const { result } = renderHook(useTodoList);
 
     const newTodo = fakeTodo({ status: TodoStatus.ACTIVE });
 
@@ -84,7 +84,7 @@ describe("stores/Todos:", () => {
 
   describe("remove an item", () => {
     it("should skip from api", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.removeTodo.mockResolvedValueOnce(false);
       const removeId = Array.from(result.current[0].todos.keys())[0];
@@ -99,7 +99,7 @@ describe("stores/Todos:", () => {
     });
 
     it("should success", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.removeTodo.mockResolvedValueOnce(true);
       const removeId = Array.from(result.current[0].todos.keys())[0];
@@ -116,7 +116,7 @@ describe("stores/Todos:", () => {
 
   describe("update status an item", () => {
     it("should skip the same", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.updateTodoStatus.mockResolvedValueOnce(true);
       const updateId = Array.from(result.current[0].todos.keys())[0];
@@ -129,7 +129,7 @@ describe("stores/Todos:", () => {
     });
 
     it("should skip from api", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.updateTodoStatus.mockResolvedValueOnce(false);
       const updateId = Array.from(result.current[0].todos.keys())[0];
@@ -149,7 +149,7 @@ describe("stores/Todos:", () => {
     });
 
     it("should success", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.updateTodoStatus.mockResolvedValueOnce(true);
       const updateId = Array.from(result.current[0].todos.keys())[0];
@@ -170,7 +170,7 @@ describe("stores/Todos:", () => {
 
   describe("update content an item", () => {
     it("should skip the same", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.updateTodoContent.mockResolvedValueOnce(true);
       const updateItem = Array.from(result.current[0].todos.values())[0];
@@ -186,7 +186,7 @@ describe("stores/Todos:", () => {
     });
 
     it("should skip from api", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.updateTodoContent.mockResolvedValueOnce(false);
       const updateItem = Array.from(result.current[0].todos.values())[0];
@@ -205,7 +205,7 @@ describe("stores/Todos:", () => {
     });
 
     it("should success", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.updateTodoContent.mockResolvedValueOnce(true);
       const updateItem = Array.from(result.current[0].todos.values())[0];
@@ -226,7 +226,7 @@ describe("stores/Todos:", () => {
 
   describe("toggle status all items", () => {
     it("should skip from api", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.updateAllTodoStatus.mockResolvedValueOnce(false);
 
@@ -240,7 +240,7 @@ describe("stores/Todos:", () => {
     });
 
     it("should active success", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.updateAllTodoStatus.mockResolvedValueOnce(true);
 
@@ -252,7 +252,7 @@ describe("stores/Todos:", () => {
     });
 
     it("should complete success", async () => {
-      const { result } = renderHook(useTodos);
+      const { result } = renderHook(useTodoList);
 
       mockService.updateAllTodoStatus.mockResolvedValueOnce(true);
 

@@ -3,12 +3,12 @@ import { TodoModel, TodoStatus } from "models/Todo";
 
 import TodoList from "../List";
 
-import { useTodoActions, useTodos } from "store/Todos";
+import { useTodoActions, useTodoList } from "store/TodoList";
 import { useTodoFilter } from "../Store.filter";
 import { fakeTodo } from "models/Todo.mock";
 
-jest.mock("store/Todos", () => ({
-  useTodos: jest.fn(),
+jest.mock("store/TodoList", () => ({
+  useTodoList: jest.fn(),
   useTodoActions: jest.fn(),
 }));
 jest.mock("../Store.filter", () => ({ useTodoFilter: jest.fn() }));
@@ -23,7 +23,7 @@ Array.from({ length: 3 }, (_, i) => {
 });
 
 const mockUseTodoActions = useTodoActions as jest.Mock;
-const mockUseTodos = useTodos as jest.Mock;
+const mockuseTodoList = useTodoList as jest.Mock;
 const mockUseTodoFilter = useTodoFilter as jest.Mock;
 
 describe("pages/Todos/List", () => {
@@ -31,7 +31,7 @@ describe("pages/Todos/List", () => {
     jest.clearAllMocks();
 
     mockUseTodoFilter.mockReturnValue([{ status: "ALL", keyword: "" }]);
-    mockUseTodos.mockReturnValue([{ todos: mapTodos }]);
+    mockuseTodoList.mockReturnValue([{ todos: mapTodos }]);
   });
 
   it("should filter status todos", () => {

@@ -3,12 +3,12 @@ import Container from "@mui/material/Container";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 
-import { useTodos } from "store/Todos";
+import { useTodoList } from "store/TodoList";
 import TodoItem from "./Item";
 import { useTodoFilter } from "./Store.filter";
 
 export default function TodoList() {
-  const [{ todos }] = useTodos();
+  const [{ todos }] = useTodoList();
   const [{ status, keyword }] = useTodoFilter();
 
   const visible = useMemo(() => {

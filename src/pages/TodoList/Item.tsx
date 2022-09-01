@@ -9,7 +9,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Clear from "@mui/icons-material/Clear";
 
 import { TodoModel, TodoStatus } from "models/Todo";
-import { useTodoActions } from "store/Todos";
+import { useTodoActions } from "store/TodoList";
 import { useLoading, withLoader } from "components/Loader";
 import { usePushAskConfirm } from "components/AsyncRender";
 import { createLocalStorage } from "utils";

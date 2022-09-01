@@ -6,7 +6,7 @@ import client from "utils/axios";
 import { routePath } from "./path";
 
 import PageLogin from "./Login";
-import PageTodos from "./Todos";
+import PageTodos from "./TodoList";
 
 export default function Pages() {
   const [{ auth }] = useAuth();

@@ -2,12 +2,12 @@ import { act, fireEvent, queryByRole, render } from "@testing-library/react";
 import { TodoStatus } from "models/Todo";
 import { fakeTodo } from "models/Todo.mock";
 import Item from "../Item";
-import { useTodoActions } from "store/Todos";
+import { useTodoActions } from "store/TodoList";
 import { usePushAskConfirm } from "components/AsyncRender";
 import { useLoading } from "components/Loader";
 import TodoForm from "../Form";
 
-jest.mock("store/Todos", () => ({ useTodoActions: jest.fn() }));
+jest.mock("store/TodoList", () => ({ useTodoActions: jest.fn() }));
 jest.mock("components/AsyncRender", () => ({ usePushAskConfirm: jest.fn() }));
 jest.mock("components/Loader", () => ({
   useLoading: jest.fn(),
