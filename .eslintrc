@@ -1,0 +1,25 @@
+{
+  "extends": "react-app",
+  "rules": {
+    "import/no-internal-modules": [
+      "error",
+      {
+        "forbid": [
+          "components",
+          "models",
+          "modules",
+          "store",
+          "store",
+          "@mui/material",
+          "@mui/icons-material",
+          "components/*/**",
+          "models/*/**",
+          "modules/*/**",
+          "store/*/**",
+          "utils/*/**",
+          "service/**"
+        ]
+      }
+    ]
+  }
+}
