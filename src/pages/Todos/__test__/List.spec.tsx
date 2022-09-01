@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { TodoModel, TodoStatus } from "models/Todo";
 
 import TodoList from "../List";
@@ -34,36 +34,31 @@ describe("pages/Todos/List", () => {
     mockUseTodos.mockReturnValue([{ todos: mapTodos }]);
   });
 
-  it("should match snapshot", () => {
-    const { container } = render(<TodoList />);
-    expect(container).toMatchSnapshot();
-  });
-
   it("should filter status todos", () => {
     mockUseTodoFilter.mockReturnValue([
       { status: TodoStatus.ACTIVE, keyword: "" },
     ]);
-    var { container } = render(<TodoList />);
-    expect(container.querySelectorAll(".list-group-item").length).toBe(2);
+    const { getAllByRole, rerender } = render(<TodoList />);
+    expect(getAllByRole("listitem")).toHaveLength(2);
 
     mockUseTodoFilter.mockReturnValue([
       { status: TodoStatus.COMPLETED, keyword: "" },
     ]);
-    var { container } = render(<TodoList />);
-    expect(container.querySelectorAll(".list-group-item").length).toBe(1);
+    rerender(<TodoList />);
+    expect(getAllByRole("listitem")).toHaveLength(1);
   });
 
   it("should filter keyword todos", () => {
     mockUseTodoFilter.mockReturnValue([
       { status: TodoStatus.ACTIVE, keyword: "" },
     ]);
-    var { container } = render(<TodoList />);
-    expect(container.querySelectorAll(".list-group-item").length).toBe(2);
+    var { getAllByRole, rerender } = render(<TodoList />);
+    expect(getAllByRole("listitem")).toHaveLength(2);
 
     mockUseTodoFilter.mockReturnValue([
       { status: "ALL", keyword: "content-2" },
     ]);
-    var { container } = render(<TodoList />);
-    expect(container.querySelectorAll(".list-group-item").length).toBe(1);
+    rerender(<TodoList />);
+    expect(getAllByRole("listitem")).toHaveLength(1);
   });
 });

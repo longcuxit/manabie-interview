@@ -31,22 +31,16 @@ export type ContainerLifeCycle<State, Action = any> = {
   dispose?: ContainerLifePoint<State, Action>;
 };
 
-export type HookSelector<V, S, F extends any[] = never> = (
-  value: V,
-  ...flags: F
-) => S;
-
 export type ContainerProps<State> = { state: State; children?: ReactNode };
-export type SubscriberProps<Value, Action> = {
-  children: (state: Value, action: Action) => ReactNode;
+export type SubscriberProps<Action, Value, T = Value> = {
+  getter?: ValueGetter<Value, T>;
+  children: (state: T, action: Action) => ReactNode;
 };
-export type HookSelect<State, Flags extends any[], Value> = (
-  state: State,
-  ...flags: Flags
-) => Value;
 
-export type UseHook<Flags extends any[], Value, Action> = (
-  ...flags: Flags
-) => [Value, Action];
+export type ValueGetter<State, Value = State> = (state: State) => Value;
+
+export type UseHook<State, Action, Value = State, G = Value> = (
+  getter?: ValueGetter<Value, G>
+) => [G, Action];
 
 export type UseAction<Action> = () => Action;

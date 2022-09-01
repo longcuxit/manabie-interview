@@ -1,10 +1,5 @@
-import {
-  fireEvent,
-  render,
-  renderHook,
-  act,
-  screen,
-} from "@testing-library/react";
+import { render, act } from "@testing-library/react";
+import { renderHook } from "utils/testting";
 
 import { Store } from "../Store";
 
@@ -34,6 +29,15 @@ describe("utils/store/Store:", () => {
     expect(result.current[0]).toBe(1);
   });
 
+  it("should hook with transform state", () => {
+    const { useHook } = createStore();
+    const { result } = renderHook(() => useHook((num) => Boolean(num % 2)));
+
+    expect(result.current[0]).toBe(false);
+    act(result.current[1]);
+    expect(result.current[0]).toBe(true);
+  });
+
   it("should container create new instance store", () => {
     const { useHook, Container } = createStore();
     const { result: globalIns } = renderHook(useHook);
@@ -61,6 +65,11 @@ describe("utils/store/Store:", () => {
 
     const tree = render(<Container state={10} />);
 
+    expect(cycle.create).toBeCalledTimes(1);
+    expect(cycle.update).toBeCalledTimes(0);
+    expect(cycle.dispose).toBeCalledTimes(0);
+
+    tree.rerender(<Container state={10} />);
     expect(cycle.create).toBeCalledTimes(1);
     expect(cycle.update).toBeCalledTimes(0);
     expect(cycle.dispose).toBeCalledTimes(0);

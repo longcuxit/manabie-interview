@@ -1,9 +1,11 @@
-import { act, renderHook } from "@testing-library/react";
+import { act } from "@testing-library/react";
+
 import { useTodos } from "../Todos";
 
 import Service from "service";
 import { TodoStatus } from "models/Todo";
 import { fakeTodo } from "models/Todo.mock";
+import { renderHook } from "utils/testting";
 
 jest.mock("service", () => {
   const fns: Record<string, jest.Mock> = {};
@@ -25,16 +27,6 @@ const fakeTodos = Array.from({ length: 2 }, (_, i) =>
 );
 
 describe("stores/Todos:", () => {
-  beforeEach(() => {
-    jest
-      .spyOn(global, "setTimeout")
-      .mockImplementation((call: any) => (call(), 1));
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it("should fetch todos", async () => {
     const { result } = renderHook(useTodos);
 

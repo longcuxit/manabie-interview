@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Container } from "react-bootstrap";
+import Container from "@mui/material/Container";
 
 import { usePushLoader } from "components/Loader";
 import { useTodoActions } from "store/Todos";
@@ -22,11 +22,9 @@ const ToDoPage = () => {
     <div className="Page-todos">
       <TodoToolbar />
       <TodoList />
-      <div className="position-sticky bg-light py-2" style={{ bottom: 0 }}>
-        <Container>
-          <TodoForm onSubmit={todoActions.create} />
-        </Container>
-      </div>
+      <Container maxWidth="sm" sx={{ py: 1 }}>
+        <TodoForm onSubmit={todoActions.create} />
+      </Container>
     </div>
   );
 };

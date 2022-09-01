@@ -17,7 +17,7 @@ export default function Pages() {
     const authToken = "Bear " + auth.accessToken;
 
     const id = client.interceptors.request.use((request) => {
-      request.headers.Authorization = authToken;
+      request.headers!.Authorization = authToken;
       return request;
     });
     return () => client.interceptors.request.eject(id);

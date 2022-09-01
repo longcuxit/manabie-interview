@@ -1,4 +1,4 @@
-type Listener = () => void;
+type Listener<T = void> = () => T;
 
 export class Notifier {
   private _listens: Listener[] = [];
@@ -15,8 +15,27 @@ export class Notifier {
     };
   }
 
+  onceListen(listener: Listener): () => void {
+    const unListen = this.addListen(() => {
+      unListen();
+      listener();
+    });
+    return unListen;
+  }
+
+  whileListen(listener: Listener<boolean | void>): () => void {
+    const unListen = this.addListen(() => {
+      if (listener() === false) unListen();
+    });
+    return unListen;
+  }
+
   protected notify(): void {
     this._listens.slice().forEach((listener) => listener());
+  }
+
+  dispose() {
+    this._listens.length = 0;
   }
 }
 

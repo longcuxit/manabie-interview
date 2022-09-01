@@ -1,21 +1,29 @@
-import { FocusEvent, useState } from "react";
-import { CloseButton, FormCheck, ListGroup, Spinner } from "react-bootstrap";
+import { FocusEvent, Fragment, useState } from "react";
 
-import classNames from "classnames";
+import ListItem from "@mui/material/ListItem";
+import IconButton from "@mui/material/IconButton";
+import Checkbox from "@mui/material/Checkbox";
+import ListItemText from "@mui/material/ListItemText";
+import CircularProgress from "@mui/material/CircularProgress";
 
-import { TodoStatus } from "models/Todo";
+import Clear from "@mui/icons-material/Clear";
+
+import { TodoModel, TodoStatus } from "models/Todo";
 import { useTodoActions } from "store/Todos";
 import { useLoading, withLoader } from "components/Loader";
-import { useAsyncConfirm } from "components/AsyncModal";
+import { usePushAskConfirm } from "components/AsyncRender";
 import { createLocalStorage } from "utils";
 import TodoForm from "./Form";
-import { TodoItemProps } from "./type";
 
-const askMeDelete = createLocalStorage("DeleteAnItem", true);
+export interface TodoItemProps {
+  item: TodoModel;
+}
+
+const askMe = createLocalStorage("DeleteAnItem", true);
 
 function TodoItem({ item }: TodoItemProps) {
   const actions = useTodoActions();
-  const showConfirm = useAsyncConfirm();
+  const showConfirm = usePushAskConfirm();
   const [loading, pushLoader] = useLoading();
 
   const [editMode, setEditMode] = useState(false);
@@ -24,22 +32,13 @@ function TodoItem({ item }: TodoItemProps) {
 
   const handleDelete = () => {
     return pushLoader(
-      (async () => {
-        const isRemove =
-          !askMeDelete.get() ||
-          (await showConfirm({
-            title: "Delete todo",
-            message: "Are you sure delete this Todo?",
-            footer: (
-              <FormCheck
-                className="flex-fill"
-                label="Don't ask again!"
-                onChange={({ target }) => askMeDelete.set(!target.checked)}
-              />
-            ),
-          }));
-        if (isRemove) await actions.remove(item.id);
-      })()
+      showConfirm({
+        shouldAsk: askMe,
+        title: "Delete todo",
+        message: "Are you sure delete this Todo?",
+      }).then((ok) => {
+        if (ok) actions.remove(item.id);
+      })
     );
   };
 
@@ -50,13 +49,7 @@ function TodoItem({ item }: TodoItemProps) {
   };
 
   return (
-    <ListGroup.Item
-      className={classNames(
-        "d-flex flex-row p-2 align-items-center",
-        loading && "disabled"
-      )}
-      onDoubleClick={() => setEditMode(true)}
-    >
+    <ListItem disablePadding>
       {editMode ? (
         <TodoForm
           defaultValue={item.content}
@@ -67,24 +60,30 @@ function TodoItem({ item }: TodoItemProps) {
           }}
         />
       ) : (
-        <>
-          <label className="label-big-holder">
-            <FormCheck
-              checked={!isActive}
-              onChange={() =>
-                pushLoader(actions.updateStatus(item.id, !isActive))
-              }
-            />
-          </label>
-          <div className="flex-fill px-2">{item.content}</div>
+        <Fragment>
+          <Checkbox
+            edge="start"
+            checked={!isActive}
+            onChange={() =>
+              pushLoader(actions.updateStatus(item.id, !isActive))
+            }
+            tabIndex={-1}
+          />
+          <ListItemText
+            primary={item.content}
+            onDoubleClick={() => setEditMode(true)}
+            role="article"
+          />
           {loading ? (
-            <Spinner animation="border" size="sm" className="mx-1" />
+            <CircularProgress size={16} />
           ) : (
-            <CloseButton onClick={handleDelete} />
+            <IconButton edge="end" onClick={handleDelete} role="deletion">
+              <Clear />
+            </IconButton>
           )}
-        </>
+        </Fragment>
       )}
-    </ListGroup.Item>
+    </ListItem>
   );
 }
 export default withLoader(TodoItem);

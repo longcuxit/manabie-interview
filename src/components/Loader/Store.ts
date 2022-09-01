@@ -1,44 +1,36 @@
 import { Store } from "utils/Store";
 
-interface LoaderState {
+export interface LoaderState {
   total: number;
   count: number;
 }
 
 const initialState: LoaderState = { total: 0, count: 0 };
 
-const store = new Store(initialState, ({ set }) => {
+const store = new Store(initialState, ({ get, set, partial }) => {
   return function <T = void>(promise: Promise<T>) {
-    (async () => {
-      set((state) => {
-        if (state.count === state.total) {
-          state.count = state.total = 0;
-        }
-        return { ...state, total: state.total + 1 };
-      });
+    let { count, total } = get();
 
-      try {
-        await promise;
-      } catch (_) {}
+    if (count === total) count = total = 0;
 
-      set((state) => {
-        return { ...state, count: state.count + 1 };
-      });
-    })();
+    set({ count, total: total + 1 });
+
+    const onDone = () => partial({ count: get().count + 1 });
+
+    promise.then(onDone).catch(onDone);
 
     return promise;
   };
 });
 
+const loadingSelector = ({ count, total }: LoaderState) => count !== total;
+
 export const useProgressLoader = store.createHook();
 
-export const useLoading = store.createHook(
-  ({ count, total }) => count !== total
-);
+export const useLoading = store.createHook(loadingSelector);
 
 export const usePushLoader = store.createHookAction();
 
 export const LoaderContainer = store.createContainer();
-export const LoaderSubscriber = store.createSubscriber(
-  ({ count, total }) => count !== total
-);
+
+export const LoaderSubscriber = store.createSubscriber(loadingSelector);

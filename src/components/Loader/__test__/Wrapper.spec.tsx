@@ -1,58 +1,46 @@
 import { render, act } from "@testing-library/react";
+import Fade from "@mui/material/Fade";
+import { Completer } from "utils";
+
+import "utils/polyfill";
+import { renderHook } from "utils/testting";
+
 import { useLoading } from "../Store";
 import { LoaderWrapper, withLoader } from "../Wrapper";
 
+jest.mock("@mui/material/Fade", () => jest.fn());
+
+const mockFade = Fade as jest.Mock;
+
 describe("components/Loader:", () => {
   beforeEach(() => {
-    jest
-      .spyOn(global, "requestAnimationFrame")
-      .mockImplementation((call) => (call(1), 1));
-
-    jest
-      .spyOn(global, "setTimeout")
-      .mockImplementation((call: any) => (call(), 1));
+    mockFade.mockImplementation((props) => <>{props.in && props.children}</>);
   });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it("should show loading with wrapper", async () => {
-    let loading!: boolean;
-    let pushLoader!: (promise: Promise<void>) => Promise<void>;
+    const { result, queryByRole } = renderHook(useLoading, {
+      wrapper: ({ children }) => <LoaderWrapper>{children}</LoaderWrapper>,
+    });
 
-    const Com = () => {
-      [loading, pushLoader] = useLoading();
-      return null;
-    };
+    expect(result.current[0]).toBe(false);
+    expect(queryByRole("progressbar")).toBeNull();
 
-    const { container } = render(
-      <LoaderWrapper>
-        <Com />
-      </LoaderWrapper>
-    );
-
-    let done!: () => void;
-    expect(loading).toBe(false);
-    expect(container.querySelector(".Loader-spinner")).not.toBeInTheDocument();
-
+    const completer = new Completer();
     act(() => {
-      pushLoader(new Promise((resolve) => (done = resolve)));
+      result.current[1](completer);
     });
 
-    expect(loading).toBe(true);
-    expect(container.querySelector(".Loader-spinner")).toBeInTheDocument();
+    expect(result.current[0]).toBe(true);
+    expect(queryByRole("progressbar")).toBeInTheDocument();
 
-    await act(async () => {
-      done();
-    });
+    await act(async () => completer.resolve());
 
-    expect(loading).toBe(false);
-    expect(container.querySelector(".Loader-spinner")).not.toBeInTheDocument();
+    expect(result.current[0]).toBe(false);
+
+    expect(queryByRole("progressbar")).toBeNull();
   });
 
   it("should render component withLoader", async () => {
-    const Com = withLoader(() => <>withLoader</>);
+    const Com = withLoader(() => <div>withLoader</div>);
 
     const { getByText } = render(<Com />);
 

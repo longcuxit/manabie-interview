@@ -1,5 +1,6 @@
-import { act, renderHook } from "@testing-library/react";
+import { act } from "@testing-library/react";
 import { TodoStatus } from "models/Todo";
+import { renderHook } from "utils/testting";
 import { useTodoFilter } from "../Store.filter";
 
 describe("pages/Todos/Store.filter:", () => {

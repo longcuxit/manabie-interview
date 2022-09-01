@@ -1,5 +1,8 @@
-import { act, renderHook } from "@testing-library/react";
+import { act } from "@testing-library/react";
+import { Fragment } from "react";
+
 import { Completer } from "utils";
+import { renderHook } from "utils/testting";
 import { useLoading, LoaderSubscriber } from "../Store";
 
 describe("components/Loader:", () => {
@@ -51,10 +54,10 @@ describe("components/Loader:", () => {
 
     const { result } = renderHook(useLoading, {
       wrapper: ({ children }) => (
-        <>
+        <Fragment>
           {children}
           <LoaderSubscriber children={(loading) => stateChanged(loading)} />
-        </>
+        </Fragment>
       ),
     });
 

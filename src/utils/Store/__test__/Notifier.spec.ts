@@ -22,6 +22,68 @@ describe("utils/store/Notifier:", () => {
 
     expect(notifier.hasListen).toBe(false);
   });
+
+  it("should clear listeners", () => {
+    const notifier = new Notifier();
+
+    notifier.addListen(() => {});
+
+    expect(notifier.hasListen).toBe(true);
+
+    notifier.dispose();
+
+    expect(notifier.hasListen).toBe(false);
+  });
+
+  describe("should trigger listener", () => {
+    class CustomNotifier extends Notifier {
+      emit = () => super.notify();
+    }
+
+    it("while notify", () => {
+      const listener = jest.fn();
+      const notifier = new CustomNotifier();
+      notifier.addListen(listener);
+
+      notifier.emit();
+      expect(listener).toBeCalledTimes(1);
+
+      notifier.emit();
+      expect(listener).toBeCalledTimes(2);
+    });
+
+    it("once time", () => {
+      const listener = jest.fn();
+      const notifier = new CustomNotifier();
+
+      notifier.onceListen(listener);
+      expect(notifier.hasListen).toBe(true);
+
+      notifier.emit();
+      expect(listener).toBeCalledTimes(1);
+
+      notifier.emit();
+      expect(listener).toBeCalledTimes(1);
+      expect(notifier.hasListen).toBe(false);
+    });
+
+    it("break when listener return 'false'", () => {
+      const listener = jest.fn();
+      const notifier = new CustomNotifier();
+
+      notifier.whileListen(listener);
+      expect(notifier.hasListen).toBe(true);
+
+      notifier.emit();
+      expect(listener).toBeCalledTimes(1);
+      expect(notifier.hasListen).toBe(true);
+
+      listener.mockReturnValue(false);
+      notifier.emit();
+      expect(listener).toBeCalledTimes(2);
+      expect(notifier.hasListen).toBe(false);
+    });
+  });
 });
 
 describe("utils/store/ValueChanged:", () => {

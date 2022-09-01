@@ -14,9 +14,8 @@ jest.mock("utils/axios", () => ({
   interceptors: { request: { use: jest.fn(), eject: jest.fn() } },
 }));
 
-jest.mock("../Login", () => () => <>PageLogin</>);
-
 jest.mock("../Todos", () => () => <>PageTodos</>);
+jest.mock("../Login", () => () => <>PageLogin</>);
 
 const fakeAuth: AuthModel = {
   accessToken: "accessToken",
@@ -29,25 +28,24 @@ describe("page routes:", () => {
   test("should to Login page", () => {
     mockUseAuth.mockReturnValue([{}]);
     localStorage.setItem("AUTH", "null");
-    const wrapper = render(
+    const { getByText } = render(
       <MemoryRouter>
         <Pages />
       </MemoryRouter>
     );
-    expect(wrapper.container).toHaveTextContent("PageLogin");
+    expect(getByText("PageLogin")).toBeInTheDocument();
   });
 
   test("should to Todos page", () => {
     mockUseAuth.mockReturnValue([{ auth: fakeAuth }]);
 
     const use = client.interceptors.request.use as jest.Mock;
-    const wrapper = render(
+    const { getByText } = render(
       <MemoryRouter>
         <Pages />
       </MemoryRouter>
     );
-    expect(use).toBeCalled();
-    expect(wrapper.container).toHaveTextContent("PageTodos");
+    expect(getByText("PageTodos")).toBeInTheDocument();
 
     expect(use.mock.calls[0][0]({ headers: {} }).headers.Authorization).toBe(
       "Bear accessToken"

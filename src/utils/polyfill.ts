@@ -2,12 +2,31 @@ declare global {
   interface ObjectConstructor {
     keys<O>(object: O): (keyof O)[];
   }
+}
 
-  interface PromiseConstructor {
-    delay(time: number): Promise<void>;
+declare module "react" {
+  interface CSSProperties {
+    [key: `--${string}`]: string | number;
   }
 }
 
-Promise.delay = (time) => new Promise((next) => setTimeout(next, time));
+// export function applyMixins(derived: any, ...bases: any[]) {
+//   bases.forEach((base) => {
+//     const define = (name: string) => {
+//       if (name !== "constructor") {
+//         Object.defineProperty(
+//           derived,
+//           name,
+//           Object.getOwnPropertyDescriptor(base, name)!
+//         );
+//       }
+//     };
+
+//     while (base) {
+//       Object.getOwnPropertyNames(base).forEach(define);
+//       base = Object.getPrototypeOf(base);
+//     }
+//   });
+// }
 
 export {};

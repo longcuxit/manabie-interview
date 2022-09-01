@@ -1,27 +1,29 @@
 import { MouseEvent } from "react";
-import {
-  Navbar,
-  Container,
-  DropdownButton,
-  Dropdown,
-  Button,
-  InputGroup,
-  FormControl,
-  FormCheck,
-} from "react-bootstrap";
-import { BoxArrowRight, Search, Trash, XLg } from "react-bootstrap-icons";
 
-import { createLocalStorage } from "utils";
+import AppBar from "@mui/material/AppBar";
+import Checkbox from "@mui/material/Checkbox";
+import IconButton from "@mui/material/IconButton";
+import MenuItem from "@mui/material/MenuItem";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Select from "@mui/material/Select";
+import Toolbar from "@mui/material/Toolbar";
+import Container from "@mui/material/Container";
+
+import Clear from "@mui/icons-material/Clear";
+import Search from "@mui/icons-material/Search";
+import DeleteSweep from "@mui/icons-material/DeleteSweep";
+import Logout from "@mui/icons-material/Logout";
+
 import { TodoStatus } from "models/Todo";
 import { useAuthAction } from "store/Auth";
 import { useTodos } from "store/Todos";
 
 import { usePushLoader } from "components/Loader";
-import { PartialCheckbox } from "components/PartialCheckbox";
-import { useAsyncConfirm } from "components/AsyncModal";
+import { usePushAskConfirm } from "components/AsyncRender";
 
-import { useTodoFilter } from "./Store.filter";
-import { StatusFilter } from "./type";
+import { StatusFilter, useTodoFilter } from "./Store.filter";
+
+import { createLocalStorage } from "utils";
 
 const statusList: StatusFilter[] = [
   "ALL",
@@ -29,39 +31,32 @@ const statusList: StatusFilter[] = [
   TodoStatus.COMPLETED,
 ];
 
-const askMeDeleteAll = createLocalStorage("DeleteAllItems", true);
-
 const LogoutButton = () => {
   const authAction = useAuthAction();
   return (
-    <Button className="ms-2" size="sm" onClick={authAction.logout}>
-      <BoxArrowRight />
-    </Button>
+    <IconButton color="inherit" onClick={authAction.logout}>
+      <Logout />
+    </IconButton>
   );
 };
 
+const askMe = createLocalStorage("DeleteAllItems", true);
+
 export default function TodoToolbar() {
-  const showConfirm = useAsyncConfirm();
+  const showConfirm = usePushAskConfirm();
   const pushLoader = usePushLoader();
 
   const [{ todos, countActive }, todoActions] = useTodos();
   const [{ status, keyword }, filterActions] = useTodoFilter();
 
-  const handleDelete = async () => {
-    const isRemove =
-      !askMeDeleteAll.get() ||
-      (await showConfirm({
-        title: "Delete all completed todo",
-        message: "Are you sure to clear all completed Todo?",
-        footer: (
-          <FormCheck
-            className="flex-fill"
-            label="Don't ask again!"
-            onChange={({ target }) => askMeDeleteAll.set(!target.checked)}
-          />
-        ),
-      }));
-    if (isRemove) pushLoader(todoActions.clearAll());
+  const handleDelete = () => {
+    return showConfirm({
+      shouldAsk: askMe,
+      title: "Delete all completed todo",
+      message: "Are you sure to clear all completed Todo?",
+    }).then((ok) => {
+      if (ok) pushLoader(todoActions.clearAll());
+    });
   };
 
   const handleClear = ({ currentTarget }: MouseEvent<HTMLButtonElement>) => {
@@ -76,75 +71,70 @@ export default function TodoToolbar() {
   };
 
   return (
-    <Navbar bg="primary" className="sticky-top">
-      <Container>
-        {Boolean(todos.size) && (
-          <label className="label-big-holder ">
-            <PartialCheckbox
-              className="mx-2"
-              checked={
-                countActive === todos.size
-                  ? false
-                  : countActive === 0
-                  ? true
-                  : undefined
-              }
-              onChange={({ target }) =>
-                pushLoader(todoActions.toggleAll(!target.checked))
-              }
+    <AppBar component="header" position="sticky">
+      <Container maxWidth="sm" disableGutters>
+        <Toolbar variant="dense">
+          {Boolean(todos.size) && (
+            <Checkbox
+              edge="start"
+              checked={countActive === 0 || !(countActive === todos.size)}
+              indeterminate={countActive > 0 && countActive < todos.size}
+              color="default"
+              onChange={({ target }) => {
+                pushLoader(todoActions.toggleAll(!target.checked));
+              }}
             />
-          </label>
-        )}
-        <InputGroup size="sm">
-          <FormControl
-            placeholder="Search ..."
-            onChange={({ target }) => {
-              filterActions.keyword(target.value.trimLeft());
-            }}
-          />
-          {keyword ? (
-            <InputGroup.Text
-              as="button"
-              className="btn-clear"
-              onClick={handleClear}
-            >
-              <XLg />
-            </InputGroup.Text>
-          ) : (
-            <InputGroup.Text
-              as="button"
-              className="btn-focus"
-              onClick={handleFocus}
-            >
-              <Search />
-            </InputGroup.Text>
           )}
-        </InputGroup>
-        <DropdownButton
-          title={status}
-          onSelect={(key) => filterActions.status(key as StatusFilter)}
-          size="sm"
-          className="mx-2"
-          align="end"
-        >
-          {statusList.map((item) => {
-            return (
-              <Dropdown.Item key={item} eventKey={item}>
-                {item}
-              </Dropdown.Item>
-            );
-          })}
-        </DropdownButton>
-        <Button
-          size="sm"
-          onClick={handleDelete}
-          variant="danger"
-          disabled={todos.size === countActive}
-        >
-          <Trash />
-        </Button>
-        <LogoutButton />
+          <OutlinedInput
+            role="searchbox"
+            placeholder="Search ..."
+            size="small"
+            color="primary"
+            fullWidth
+            inputProps={{ sx: { color: "#fff" } }}
+            onChange={({ target }) => {
+              filterActions.keyword(target.value.trimStart());
+            }}
+            endAdornment={
+              keyword ? (
+                <IconButton edge="end" onClick={handleClear} role="deletion">
+                  <Clear />
+                </IconButton>
+              ) : (
+                <IconButton edge="end" onClick={handleFocus} role="search">
+                  <Search />
+                </IconButton>
+              )
+            }
+          />
+          <Select
+            value={status}
+            size="small"
+            color="secondary"
+            sx={{ mx: 1 }}
+            onChange={({ target }) => filterActions.status(target.value as any)}
+            displayEmpty
+          >
+            {statusList.map((item) => {
+              return (
+                <MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>
+              );
+            })}
+          </Select>
+
+          <IconButton
+            onClick={handleDelete}
+            disabled={todos.size === countActive}
+            color="inherit"
+            role="clear"
+          >
+            <DeleteSweep />
+          </IconButton>
+          <LogoutButton />
+        </Toolbar>
       </Container>
-    </Navbar>
+    </AppBar>
   );
 }

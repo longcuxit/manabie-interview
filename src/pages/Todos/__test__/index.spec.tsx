@@ -25,10 +25,8 @@ describe("pages/Todos/List", () => {
     mockUsePushLoader.mockReturnValue(pushLoader);
   });
 
-  it("should match snapshot & initialize todos", () => {
-    const { container } = render(<ToDoPage />);
-
-    expect(container).toMatchSnapshot();
+  it("should initialize todos", () => {
+    render(<ToDoPage />);
 
     expect(initialize).toBeCalledTimes(1);
     expect(pushLoader).toBeCalledTimes(1);

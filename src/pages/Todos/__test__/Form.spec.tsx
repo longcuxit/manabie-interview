@@ -18,73 +18,59 @@ describe("pages/Todos/Form:", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseLoading.mockReturnValue([false, pushLoader]);
-  });
-
-  it("should match snapshot", () => {
-    const { container } = render(<TodoForm onSubmit={onSubmit} />);
-    expect(container).toMatchSnapshot();
+    pushLoader.mockImplementation((value) => value);
+    onSubmit.mockReturnValue(Promise.resolve());
   });
 
   it("should show loading", () => {
     mockUseLoading.mockReturnValue([true, pushLoader]);
-    const { container } = render(<TodoForm onSubmit={onSubmit} />);
+    const { getByRole } = render(<TodoForm onSubmit={onSubmit} />);
 
-    expect(container.querySelector(".spinner-border")).toBeInTheDocument();
+    expect(getByRole("progressbar")).toBeInTheDocument();
   });
 
   it("should show focus button & focus to input", () => {
-    const { container } = render(<TodoForm onSubmit={onSubmit} />);
+    const { getByRole } = render(<TodoForm onSubmit={onSubmit} />);
 
-    const focusBtn = container.querySelector(".btn-focus")!;
+    const focusBtn = getByRole("button");
     expect(focusBtn).toBeInTheDocument();
 
-    const input = container.querySelector(".form-control") as HTMLInputElement;
+    const input = getByRole("textbox") as HTMLInputElement;
     const focus = (input.focus = jest.fn());
     fireEvent.click(focusBtn, { currentTarget: focusBtn });
 
     expect(focus).toBeCalledTimes(1);
   });
 
-  it("should show send button", async () => {
-    const { container } = render(<TodoForm onSubmit={onSubmit} />);
+  it("should show send button", () => {
+    const { getByRole } = render(<TodoForm onSubmit={onSubmit} />);
 
-    const input = container.querySelector(".form-control")!;
+    const input = getByRole("textbox");
     fireEvent.change(input, { target: { value: "Message" } });
 
-    const sendBtn = container.querySelector(".btn-send")!;
-    expect(sendBtn).toBeInTheDocument();
+    expect(getByRole("button")).toHaveAttribute("type", "submit");
   });
 
   it("should skip submit when don't have value", async () => {
-    const { container } = render(<TodoForm onSubmit={onSubmit} />);
+    const { getByRole } = render(<TodoForm onSubmit={onSubmit} />);
 
-    const form = container.querySelector("form.input-group")!;
-
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    fireEvent.submit(getByRole("form"));
 
     expect(pushLoader).not.toBeCalled();
     expect(onSubmit).not.toBeCalled();
   });
 
   it("should submit form", async () => {
-    const { container } = render(<TodoForm onSubmit={onSubmit} />);
-
-    const form = container.querySelector("form.input-group")!;
-
-    const input = container.querySelector(".form-control")!;
-    act(() => {
-      fireEvent.change(input, { target: { value: "Message" } });
-    });
+    const { getByRole } = render(<TodoForm onSubmit={onSubmit} />);
 
     await act(async () => {
-      fireEvent.submit(form);
+      fireEvent.change(getByRole("textbox"), { target: { value: "Message" } });
+      fireEvent.submit(getByRole("form"));
     });
 
     expect(pushLoader).toBeCalledTimes(1);
     expect(onSubmit).toBeCalledWith("Message");
 
-    expect(container.querySelector(".btn-focus")).toBeInTheDocument();
+    expect(getByRole("button")).not.toHaveAttribute("type", "submit");
   });
 });

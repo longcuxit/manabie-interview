@@ -1,31 +1,36 @@
 import {
+  Component,
   Context,
   createContext,
   createElement,
-  FC,
   Fragment,
   useContext,
-  useEffect,
-  useState,
+  useSyncExternalStore,
 } from "react";
 
 import {
-  HookSelector,
   ContainerLifeCycle,
   ContainerLifePoint,
   ActionCreator,
   ContainerProps,
-  HookSelect,
   SubscriberProps,
   UseAction,
-  UseHook,
+  ValueGetter,
 } from "./type";
 import { Subscriber } from "./Subscriber";
 
-const getName = (sub: string, name = "SweetStore") => `${name}.${sub}`;
+const getName = (sub: string, name: string) => `${name}.${sub}`;
+
+function createSelector<S, V = S>(selector?: ValueGetter<S, V>) {
+  if (!selector) selector = (state) => state as any;
+  return function <T = V>(state: S, getter?: ValueGetter<V, T>): T {
+    const value = selector!(state);
+    return getter ? getter(value) : (value as any);
+  };
+}
 
 export class Store<State, Action> {
-  private Context: Context<Subscriber<State, Action>>;
+  Context: Context<Subscriber<State, Action>>;
 
   constructor(
     state: State,
@@ -33,12 +38,12 @@ export class Store<State, Action> {
     displayName?: string
   ) {
     this.Context = createContext(new Subscriber(state, this.createAction));
-    this.Context.displayName = displayName;
+    this.Context.displayName = displayName || "SweetStore";
   }
 
   createContainer<Props extends ContainerProps<State>>(
     cycle: ContainerLifeCycle<State, Action> = {}
-  ): FC<Props> {
+  ) {
     const { Context, createAction } = this;
 
     const firePoint = (
@@ -46,65 +51,69 @@ export class Store<State, Action> {
       fire?: ContainerLifePoint<State, Action>
     ) => fire && fire(store.api, store.action);
 
-    const Container: FC<Props> = ({ children, state }) => {
-      const [store] = useState(() => new Subscriber(state, createAction));
+    class Container extends Component<Props> {
+      static displayName = getName("Container", Context.displayName!);
 
-      useEffect(() => {
-        firePoint(store, cycle.create);
-        return () => firePoint(store, cycle.dispose);
-      }, [store]);
+      store: Subscriber<State, Action>;
 
-      useEffect(() => {
-        if (store.value !== state) {
-          store.value = state;
-          firePoint(store, cycle.update);
+      constructor(props: Props) {
+        super(props);
+        this.store = new Subscriber(props.state, createAction);
+        firePoint(this.store, cycle.create);
+      }
+
+      shouldComponentUpdate(props: Props) {
+        if (this.props.state !== props.state) {
+          this.store.api.set(props.state);
+          firePoint(this.store, cycle.update);
         }
-      }, [state, store]);
+        return true;
+      }
 
-      return createElement(Context.Provider, { value: store, children });
-    };
+      componentWillUnmount() {
+        firePoint(this.store, cycle.dispose);
+        this.store.dispose();
+      }
 
-    Container.displayName = getName("Container", this.Context.displayName);
+      render() {
+        return createElement(Context.Provider, {
+          value: this.store,
+          children: this.props.children,
+        });
+      }
+    }
+
     return Container;
   }
 
-  createSubscriber<Props extends SubscriberProps<Value, Action>, Value = State>(
-    selector?: HookSelector<State, Value>
-  ): FC<Props> {
-    const useHook = this.createHook(selector);
+  createSubscriber<Value = State>(selector?: ValueGetter<State, Value>) {
+    const { Context } = this;
 
-    const Subscriber: FC<Props> = ({ children }) => {
-      const [state, action] = useHook();
-      return createElement(Fragment, { children: children(state, action) });
-    };
-    Subscriber.displayName = getName("Subscriber", this.Context.displayName);
+    type Props<T> = SubscriberProps<Action, Value, T>;
+    const useStore = this.createHook(selector);
 
-    return Subscriber;
+    function StoreSubscriber<T = Value>(props: Props<T>): JSX.Element {
+      const [state, action] = useStore(props.getter);
+      return createElement(Fragment, {
+        children: props.children(state, action),
+      });
+    }
+
+    return Object.assign(StoreSubscriber, {
+      displayName: getName("Subscriber", Context.displayName!),
+    });
   }
 
-  createHook<
-    Select extends HookSelect<State, Flags, Value>,
-    Value = State,
-    Flags extends any[] = never
-  >(
-    selector?: HookSelector<State, Value, Flags>
-  ): UseHook<Flags, Value, Action> {
-    const select = (selector || ((v) => v)) as Select;
+  createHook<Value = State>(selector?: ValueGetter<State, Value>) {
+    const select = createSelector(selector);
+    const { Context } = this;
 
-    return (...flags: Flags): [Value, Action] => {
-      const subscriber = useContext(this.Context);
-      const [state, setState] = useState(() =>
-        select(subscriber.value, ...flags)
+    return function <T = Value>(getter?: ValueGetter<Value, T>): [T, Action] {
+      const subscriber = useContext(Context);
+      const state = useSyncExternalStore(
+        subscriber.addListen.bind(subscriber),
+        () => select(subscriber.value, getter)
       );
-
-      useEffect(() => {
-        setState(select(subscriber.value, ...flags));
-
-        return subscriber.addListen(() => {
-          setState(select(subscriber.value, ...flags));
-        });
-        // eslint-disable-next-line
-      }, [subscriber, ...flags]);
 
       return [state, subscriber.action];
     };

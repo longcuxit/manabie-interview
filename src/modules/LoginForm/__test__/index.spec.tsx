@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { useAuthAction } from "store/Auth";
-import FormLogin from "../Form";
+import FormLogin from "../";
 
 jest.mock("store/Auth", () => ({
   useAuthAction: jest.fn(),
@@ -10,25 +10,16 @@ jest.mock("store/Auth", () => ({
 const mockUseAuthAction = useAuthAction as jest.Mock;
 
 describe("pages/Login/Form:", () => {
-  test("match snapshot", () => {
-    const { container } = render(
-      <MemoryRouter>
-        <FormLogin />
-      </MemoryRouter>
-    );
-    expect(container).toMatchSnapshot();
-  });
-
   test("submit form", () => {
-    const login = jest.fn();
+    const login = jest.fn().mockResolvedValue(void 0);
     mockUseAuthAction.mockImplementation(() => ({ login }));
 
-    const { container } = render(
+    const { getByRole } = render(
       <MemoryRouter>
         <FormLogin />
       </MemoryRouter>
     );
-    fireEvent.click(container.querySelector("[type=submit]")!);
+    fireEvent.submit(getByRole("form"));
 
     expect(login).toBeCalledTimes(1);
   });

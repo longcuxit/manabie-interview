@@ -9,6 +9,12 @@ const questUser: UserModel = {
   id: "Quest",
   status: UserStatus.ACTIVE,
   created_date: "",
+  config: {
+    askMe: {
+      todoBathRemove: true,
+      todoRemove: true,
+    },
+  },
 };
 
 const authStorage = createLocalStorage<AuthModel | null>("AUTH", null);
@@ -16,8 +22,8 @@ const authStorage = createLocalStorage<AuthModel | null>("AUTH", null);
 const initialState: AuthState = { auth: authStorage.get(), user: questUser };
 
 const store = new Store<AuthState, AuthActions>(
-  initialState,
-  ({ partial }) => ({
+  { ...initialState },
+  ({ partial, set }) => ({
     async login(username: string, password: string): Promise<void> {
       const auth = await Service.login(username, password);
       authStorage.set(auth);
@@ -26,7 +32,7 @@ const store = new Store<AuthState, AuthActions>(
 
     async logout(): Promise<void> {
       authStorage.set(null);
-      partial({ auth: null, user: questUser });
+      set({ auth: null, user: questUser });
     },
   })
 );

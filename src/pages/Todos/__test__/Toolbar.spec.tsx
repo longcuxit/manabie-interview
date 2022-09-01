@@ -1,31 +1,26 @@
-import { act, fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render, within } from "@testing-library/react";
 import { TodoModel, TodoStatus } from "models/Todo";
 
 import { useTodos } from "store/Todos";
-import { useAsyncConfirm } from "components/AsyncModal";
+import { usePushAskConfirm } from "components/AsyncRender";
 import { usePushLoader } from "components/Loader";
 import { useTodoFilter } from "../Store.filter";
-import { PartialCheckbox } from "components/PartialCheckbox";
 
 import TodoToolbar from "../Toolbar";
 import { fakeTodo } from "models/Todo.mock";
 
 jest.mock("../Store.filter", () => ({ useTodoFilter: jest.fn() }));
 jest.mock("store/Todos", () => ({ useTodos: jest.fn() }));
-jest.mock("components/AsyncModal", () => ({ useAsyncConfirm: jest.fn() }));
-jest.mock("components/PartialCheckbox", () => ({
-  PartialCheckbox: jest.fn(() => <>PartialCheckbox</>),
-}));
+jest.mock("components/AsyncRender", () => ({ usePushAskConfirm: jest.fn() }));
 jest.mock("components/Loader", () => ({
   usePushLoader: jest.fn(),
   withLoader: (Com: any) => Com,
 }));
 
 const mockUseTodos = useTodos as jest.Mock;
-const mockUseAsyncConfirm = useAsyncConfirm as jest.Mock;
+const mockUsePushAskConfirm = usePushAskConfirm as jest.Mock;
 const mockUsePushLoader = usePushLoader as jest.Mock;
 const mockUseTodoFilter = useTodoFilter as jest.Mock;
-const mockPartialCheckbox = PartialCheckbox as jest.Mock;
 
 const mapTodos = new Map<string, TodoModel>();
 Array.from({ length: 3 }, (_, i) => {
@@ -57,59 +52,42 @@ describe("pages/Todos/ToolBar: ", () => {
       { todos: mapTodos, countActive: 1 },
       { updateStatus, clearAll, toggleAll },
     ]);
-    mockUseAsyncConfirm.mockReturnValue(showConfirm);
-  });
-
-  it("should match snapshot", () => {
-    const { container } = render(<TodoToolbar />);
-
-    expect(container).toMatchSnapshot();
+    mockUsePushAskConfirm.mockReturnValue(showConfirm);
   });
 
   describe("filter keyword: ", () => {
-    it("should focus input when click focus button", async () => {
-      const { container } = render(<TodoToolbar />);
+    it("should focus input when click focus button", () => {
+      const { getByRole } = render(<TodoToolbar />);
+      const input = within(getByRole("searchbox")).getByRole("textbox");
 
-      const focusBtn = container.querySelector(".btn-focus")!;
-      const input = container.querySelector(
-        ".form-control"
-      ) as HTMLInputElement;
-      const focus = (input.focus = jest.fn());
+      fireEvent.click(getByRole("search"));
 
-      fireEvent.click(focusBtn);
-
-      expect(focus).toBeCalledTimes(1);
+      expect(input).toHaveFocus();
     });
 
-    it("should filter when change value", async () => {
-      const { container } = render(<TodoToolbar />);
-
-      const input = container.querySelector(
-        ".form-control"
-      ) as HTMLInputElement;
+    it("should filter when change value", () => {
+      const { getByRole } = render(<TodoToolbar />);
+      const input = within(getByRole("searchbox")).getByRole("textbox");
 
       fireEvent.change(input, { target: { value: "Keyword" } });
 
       expect(filterKeyword).toBeCalledWith("Keyword");
     });
 
-    it("should show clear button & reset value", async () => {
+    it("should show clear button & reset value", () => {
       mockUseTodoFilter.mockReturnValue([
         { status: "ALL", keyword: "Keyword" },
         { status: filterStatus, keyword: filterKeyword },
       ]);
-
-      const { container } = render(<TodoToolbar />);
-
-      const input = container.querySelector(
-        ".form-control"
-      ) as HTMLInputElement;
-      const clearBtn = container.querySelector(".btn-clear")!;
-
-      expect(clearBtn).toBeInTheDocument();
+      const { getByRole } = render(<TodoToolbar />);
+      const searchBox = within(getByRole("searchbox"));
+      const input = searchBox.getByRole("textbox") as HTMLInputElement;
+      const clearBtn = searchBox.getByRole("deletion");
 
       input.value = "Keyword";
+      fireEvent.change(input, { target: { value: "Keyword" } });
 
+      expect(clearBtn).toBeInTheDocument();
       fireEvent.click(clearBtn);
 
       expect(input.value).toBe("");
@@ -117,31 +95,16 @@ describe("pages/Todos/ToolBar: ", () => {
   });
 
   describe("toggle all", () => {
-    it("should show partial", () => {
-      mockUseTodos.mockReturnValue([{ todos: mapTodos, countActive: 1 }]);
-
-      render(<TodoToolbar />);
-
-      expect(mockPartialCheckbox).toBeCalled();
-
-      const props = mockPartialCheckbox.mock.calls[0][0];
-      expect(props.checked).toBe(undefined);
-    });
-
     it("should show checked & complete all todos", () => {
       mockUseTodos.mockReturnValue([
         { todos: mapTodos, countActive: 0 },
         { toggleAll },
       ]);
 
-      render(<TodoToolbar />);
+      const { getByRole } = render(<TodoToolbar />);
 
-      expect(mockPartialCheckbox).toBeCalled();
+      fireEvent.click(getByRole("checkbox"));
 
-      const props = mockPartialCheckbox.mock.calls[0][0];
-      expect(props.checked).toBe(true);
-
-      props.onChange({ target: { checked: false } });
       expect(toggleAll).toBeCalledWith(true);
     });
 
@@ -151,26 +114,22 @@ describe("pages/Todos/ToolBar: ", () => {
         { toggleAll },
       ]);
 
-      render(<TodoToolbar />);
+      const { getByRole } = render(<TodoToolbar />);
 
-      expect(mockPartialCheckbox).toBeCalled();
+      fireEvent.click(getByRole("checkbox"));
 
-      const props = mockPartialCheckbox.mock.calls[0][0];
-      expect(props.checked).toBe(false);
-
-      props.onChange({ target: { checked: true } });
       expect(toggleAll).toBeCalledWith(false);
     });
   });
 
   describe("delete all ", () => {
-    it("should show confirm % cancel delete", async () => {
-      showConfirm.mockResolvedValue(undefined);
+    it("should cancel delete", async () => {
+      showConfirm.mockResolvedValue(false);
 
-      const { container } = render(<TodoToolbar />);
+      const { getByRole } = render(<TodoToolbar />);
 
       await act(async () => {
-        fireEvent.click(container.querySelector(".btn-danger")!);
+        fireEvent.click(getByRole("clear"));
       });
 
       expect(showConfirm).toBeCalled();
@@ -178,72 +137,27 @@ describe("pages/Todos/ToolBar: ", () => {
       expect(clearAll).not.toBeCalled();
     });
 
-    it("should show confirm % accept delete", async () => {
+    it("should accept delete", async () => {
       showConfirm.mockResolvedValue(true);
 
-      const { container } = render(<TodoToolbar />);
+      const { getByRole } = render(<TodoToolbar />);
 
       await act(async () => {
-        fireEvent.click(container.querySelector(".btn-danger")!);
+        fireEvent.click(getByRole("clear"));
       });
 
       expect(showConfirm).toBeCalled();
-      expect(pushLoader).toBeCalled();
-      expect(clearAll).toBeCalled();
-    });
-
-    it("should ignore show confirm", async () => {
-      const { container, rerender } = render(
-        <>
-          <TodoToolbar />
-          {false}
-        </>
-      );
-
-      await act(async () => {
-        fireEvent.click(container.querySelector(".btn-danger")!);
-      });
-
-      expect(showConfirm).toBeCalled();
-
-      rerender(
-        <>
-          <TodoToolbar />
-          {showConfirm.mock.calls[0][0].footer}
-        </>
-      );
-
-      const askMe = container.querySelector(".flex-fill .form-check-input")!;
-
-      expect(askMe).toBeInTheDocument();
-      expect(localStorage.getItem("DeleteAllItems")).toBe("true");
-      fireEvent.click(askMe);
-      expect(localStorage.getItem("DeleteAllItems")).toBe("false");
-    });
-
-    it("should don't show confirm % accept delete", async () => {
-      showConfirm.mockResolvedValue(true);
-
-      const { container } = render(<TodoToolbar />);
-
-      await act(async () => {
-        fireEvent.click(container.querySelector(".btn-danger")!);
-      });
-
-      expect(showConfirm).not.toBeCalled();
       expect(pushLoader).toBeCalled();
       expect(clearAll).toBeCalled();
     });
   });
 
   it("filter status", () => {
-    const { container } = render(<TodoToolbar />);
+    const { getByRole } = render(<TodoToolbar />);
 
-    fireEvent.click(container.querySelector(".dropdown-toggle")!);
-
-    expect(container.querySelector(".dropdown-menu")).toBeInTheDocument();
-
-    fireEvent.click(container.querySelectorAll(".dropdown-item")[1]);
+    fireEvent.mouseDown(getByRole("button", { expanded: false }));
+    const listbox = within(getByRole("listbox"));
+    fireEvent.click(listbox.getByText("ACTIVE"));
 
     expect(filterStatus).toBeCalledWith("ACTIVE");
   });

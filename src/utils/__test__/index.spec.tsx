@@ -1,4 +1,4 @@
-import { createLocalStorage, debounce } from "utils";
+import { Completer, createLocalStorage, debounce, mergeVoidFns } from "utils";
 
 import "../axios";
 
@@ -9,7 +9,7 @@ describe("utils/debounce:", () => {
     debounced();
     debounced();
     debounced();
-    await Promise.delay(100);
+    await Completer.timeout(100);
 
     expect(fn).toBeCalledTimes(2);
   });
@@ -20,11 +20,11 @@ describe("utils/debounce:", () => {
     debounced();
     debounced();
     debounced();
-    await Promise.delay(100);
+    await Completer.timeout(100);
     debounced();
     debounced();
     debounced();
-    await Promise.delay(100);
+    await Completer.timeout(100);
 
     expect(fn).toBeCalledTimes(3);
   });
@@ -35,11 +35,11 @@ describe("utils/debounce:", () => {
     debounced();
     debounced();
     debounced();
-    await Promise.delay(100);
+    await Completer.timeout(100);
     debounced();
     debounced();
     debounced();
-    await Promise.delay(100);
+    await Completer.timeout(100);
 
     expect(fn).toBeCalledTimes(3);
   });
@@ -59,10 +59,10 @@ describe("utils/localStorage:", () => {
   });
 });
 
-describe("utils/Promise.delay:", () => {
-  it("initial default value", async () => {
-    const now = Date.now();
-    await Promise.delay();
-    expect(Date.now() - now >= 0).toBe(true);
+describe("utils/eachVoidCall:", () => {
+  it("should each call functions", () => {
+    const calls = [jest.fn(), jest.fn(), jest.fn()];
+    mergeVoidFns(...calls)();
+    calls.forEach((call) => expect(call).toBeCalledTimes(1));
   });
 });

@@ -1,24 +1,14 @@
-import { act, renderHook } from "@testing-library/react";
+import { renderHook } from "utils/testting";
 import { useAuth } from "../Auth";
-
 import Service from "service";
 import { AuthModel } from "models/User";
+import { act } from "@testing-library/react";
 
 jest.mock("service", () => ({ login: jest.fn() }));
 
 const mockLogin = Service.login as jest.Mock;
 
 describe("stores/Auth:", () => {
-  beforeEach(() => {
-    jest
-      .spyOn(global, "setTimeout")
-      .mockImplementation((call: any) => (call(), 1));
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it("should login/logout", async () => {
     const { result } = renderHook(useAuth);
 
@@ -38,7 +28,6 @@ describe("stores/Auth:", () => {
 
     await act(async () => result.current[1].logout());
 
-    expect(result.current[0].auth).toBeNull();
     expect(localStorage.getItem("AUTH")).toBe("null");
   });
 });

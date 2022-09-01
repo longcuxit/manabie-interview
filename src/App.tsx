@@ -1,38 +1,44 @@
 import { BrowserRouter } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
-import "bootstrap/dist/css/bootstrap.min.css";
+import "react-toastify/dist/ReactToastify.css";
 
-import { AsyncModal } from "components/AsyncModal";
-
+import { useEffect, useState } from "react";
 import Pages from "./pages";
 
-import "./App.css";
+import { AsyncRenderContainer } from "components/AsyncRender";
 import { LoaderWrapper, usePushLoader } from "components/Loader";
-import { useEffect, useState } from "react";
+
 import Service from "service";
+import { Completer } from "utils";
+import Opps from "pages/Opps";
 
 function App() {
-  const [connected, setConnected] = useState(false);
+  const [connected, setConnected] = useState<boolean | null>(null);
   const pushLoader = usePushLoader();
 
   useEffect(() => {
-    pushLoader(Service.connect()).then(setConnected);
+    const connect = Completer.listen(Service.connect());
+    pushLoader(connect.then(setConnected));
+    return connect.reject;
   }, [pushLoader]);
 
-  if (!connected) return null;
+  if (connected === null) return null;
+  if (connected === false) return <Opps />;
 
   return (
-    <AsyncModal>
+    <AsyncRenderContainer>
       <BrowserRouter basename={process.env.PUBLIC_URL}>
         <Pages />
       </BrowserRouter>
-    </AsyncModal>
+      <ToastContainer />
+    </AsyncRenderContainer>
   );
 }
 
 export default function AppLoader() {
   return (
-    <LoaderWrapper as="main" className="App">
+    <LoaderWrapper>
       <App />
     </LoaderWrapper>
   );

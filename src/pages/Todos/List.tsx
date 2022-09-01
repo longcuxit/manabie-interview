@@ -1,5 +1,7 @@
-import { useMemo } from "react";
-import { Container, ListGroup } from "react-bootstrap";
+import { useEffect, useMemo } from "react";
+import Container from "@mui/material/Container";
+import List from "@mui/material/List";
+import Typography from "@mui/material/Typography";
 
 import { useTodos } from "store/Todos";
 import TodoItem from "./Item";
@@ -26,13 +28,21 @@ export default function TodoList() {
     return visible;
   }, [status, keyword, todos]);
 
+  useEffect(() => {}, [visible.length]);
+
   return (
-    <Container className="my-2">
-      <ListGroup className="ToDo__list">
-        {visible.map((todo) => (
-          <TodoItem key={todo.id} item={todo} />
-        ))}
-      </ListGroup>
+    <Container maxWidth="sm">
+      {visible.length ? (
+        <List>
+          {visible.map((todo) => (
+            <TodoItem key={todo.id} item={todo} />
+          ))}
+        </List>
+      ) : (
+        <Typography variant="h4" color="gray" textAlign="center" p={2}>
+          No result
+        </Typography>
+      )}
     </Container>
   );
 }

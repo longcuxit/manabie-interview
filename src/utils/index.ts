@@ -36,3 +36,10 @@ export function createLocalStorage<T>(name: string, initial: T) {
     },
   };
 }
+
+export function mergeVoidFns<T, A extends ((() => void) | (() => void)[])[]>(
+  this: T,
+  ...effects: A
+) {
+  return () => effects.flat().forEach((call) => call.call(this));
+}

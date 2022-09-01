@@ -1,61 +1,72 @@
 import {
   createElement,
-  useState,
-  useEffect,
   ComponentType,
   FunctionComponent,
+  Fragment,
+  ReactNode,
 } from "react";
-import classNames from "classnames";
-import { Spinner } from "react-bootstrap";
 
-import { LoaderContainer, useLoading } from "./Store";
-import { LoaderWrapperProps } from "./type";
+import CircularProgress from "@mui/material/CircularProgress";
+import Fade from "@mui/material/Fade";
+import Box from "@mui/material/Box";
 
-import "./style.css";
+import { LoaderContainer, LoaderState, useProgressLoader } from "./Store";
+
+export interface LoaderWrapperProps {
+  children: ReactNode;
+  loader?: (state: LoaderState) => ReactNode;
+}
+
+const styles = {
+  root: {
+    position: "absolute",
+    inset: 0,
+    "&::before": {
+      content: '""',
+      position: "absolute",
+      inset: 0,
+      backgroundColor: "#00000033",
+      zIndex: "999999",
+    },
+  },
+  spinner: {
+    zIndex: "999999",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
+const DefaultLoader = ({ total, count }: LoaderState) => {
+  return (
+    <Fade in={total !== count} unmountOnExit>
+      <Box sx={styles.root}>
+        <CircularProgress sx={styles.spinner} size={50} />
+      </Box>
+    </Fade>
+  );
+};
 
 export function LoaderWrapper({
-  as = "div",
-  duration = 300,
   children,
-  SpinnerProps = { animation: "border" },
-  ...props
+  loader = DefaultLoader,
 }: LoaderWrapperProps) {
-  const [loading] = useLoading();
-  const [isIn, setIsIn] = useState(false);
+  const [state] = useProgressLoader();
 
-  props.className = classNames(
-    props.className,
-    "Loader",
-    loading && "Loader-loading",
-    isIn && "in"
-  );
-  props.style = { ...props.style, "--loader-duration": duration + "ms" } as any;
-
-  useEffect(() => {
-    if (loading && !isIn) requestAnimationFrame(() => setIsIn(true));
-    else if (!loading && isIn) {
-      const timeOut = setTimeout(() => setIsIn(false), duration);
-      return () => clearTimeout(timeOut);
-    }
-  }, [loading, isIn, duration]);
-
-  return createElement(
-    as,
-    props,
-    <>
+  return (
+    <Fragment>
       {children}
-      {(loading || isIn) && (
-        <div className="Loader-spinner">
-          {createElement(Spinner, SpinnerProps)}
-        </div>
-      )}
-    </>
+      {loader(state)}
+    </Fragment>
   );
 }
 
 const initialState = { total: 0, count: 0 };
 
-export function withLoader<P>(Com: ComponentType<P>): FunctionComponent<P> {
+export function withLoader<P extends {}>(
+  Com: ComponentType<P>
+): FunctionComponent<P> {
   return (props: P) => {
     return (
       <LoaderContainer state={initialState}>

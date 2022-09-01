@@ -4,22 +4,22 @@ enum CompleterStatus {
   rejected,
 }
 
-export interface Completer<T = void> extends Promise<T> {
+export interface Completer<T = void> {
   readonly completed: boolean;
   readonly rejected: boolean;
   readonly resolve: (value: T | PromiseLike<T>) => void;
   readonly reject: (error?: any) => void;
 }
 
-export class Completer<T = void> {
+export class Completer<T = void> extends Promise<T> {
   constructor() {
     let resolve!: (value: T | PromiseLike<T>) => void;
     let reject!: (error?: any) => void;
 
-    const promise = new Promise<T>((next, error) => {
+    super((next, error) => {
       resolve = next;
       reject = error;
-    }) as Completer<T>;
+    });
 
     let status = CompleterStatus.running;
 
@@ -29,7 +29,7 @@ export class Completer<T = void> {
       }
     };
 
-    Object.defineProperties(promise, {
+    Object.defineProperties(this, {
       completed: { get: () => Boolean(status) },
       rejected: { get: () => status === CompleterStatus.rejected },
       resolve: {
@@ -42,14 +42,56 @@ export class Completer<T = void> {
       },
       reject: {
         value(error: any) {
-          checkBadStack();
+          if (error) checkBadStack();
+          if (status) return;
           status = CompleterStatus.rejected;
           reject(error);
         },
         writable: false,
       },
     });
+  }
 
-    return promise;
+  static get [Symbol.species]() {
+    return Promise;
+  }
+
+  get [Symbol.toStringTag]() {
+    return "Completer";
+  }
+
+  static listen<T>(promise: Promise<T>) {
+    const completer = new Completer<T>();
+
+    promise.then(
+      (value) => completer.completed || completer.resolve(value),
+      (error) => completer.completed || completer.reject(error)
+    );
+
+    return completer;
+  }
+
+  static timeout<T = void>(time: number, value?: T | PromiseLike<T>) {
+    const completer = new Completer<T>();
+    const timeout = setTimeout(() => completer.resolve(value!), time);
+    const unTimeout = () => clearTimeout(timeout);
+    completer.then(unTimeout, unTimeout);
+    return completer;
+  }
+
+  static frame<T = void>(skipFrame = 0, value?: T | PromiseLike<T>) {
+    const completer = new Completer<T>();
+    skipFrame++;
+    let frameId: number;
+    const run = () => {
+      if (!skipFrame--) return completer.resolve(value!);
+      frameId = requestAnimationFrame(run);
+    };
+    run();
+
+    const cancelFrame = () => cancelAnimationFrame(frameId);
+    completer.then(cancelFrame, cancelFrame);
+
+    return completer;
   }
 }

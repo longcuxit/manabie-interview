@@ -1,3 +1,5 @@
+import { UserPreferencesModel } from "./User.config";
+
 export enum UserStatus {
   ACTIVE = "ACTIVE",
   BLOCKED = "BLOCKED",
@@ -10,6 +12,7 @@ export interface AuthModel {
 }
 
 export interface UserModel {
+  config: UserPreferencesModel;
   username: string;
   created_date: string;
   status: UserStatus;
